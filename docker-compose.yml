@@ -1,0 +1,384 @@
+services:
+  # Go Application
+  primes-go:
+    build:
+      context: ./go
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    environment:
+      - PORT=8080
+      - DAPR_GRPC_ENDPOINT=primes-go-dapr:50001
+      - DAPR_HTTP_ENDPOINT=http://primes-go-dapr:3500
+    networks:
+      - dapr-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  primes-go-dapr:
+    image: "daprio/daprd:${DAPRD_VERSION}"
+    command:
+      [
+        "./daprd",
+        "-app-id",
+        "primes-go",
+        "-app-channel-address",
+        "primes-go",
+        "-app-port",
+        "8080",
+        "-dapr-http-port",
+        "3500",
+        "-dapr-grpc-port",
+        "50001",
+        "-placement-host-address",
+        "placement:50005",
+        "-scheduler-host-address",
+        "scheduler-0:50006,scheduler-1:50006,scheduler-2:50006",
+        "-resources-path",
+        "/components",
+        "-config",
+        "/dapr_config/config.yml",
+        "-log-level",
+        "info",
+      ]
+    volumes:
+      - "./components:/components"
+      - "./dapr_config/:/dapr_config"
+    depends_on:
+      - primes-go
+      - placement
+      - scheduler-0
+      - scheduler-1
+      - scheduler-2
+    networks:
+      - dapr-network
+    ports:
+      - "3500:3500"
+
+  # Python Application
+  primes-python:
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8080"
+    environment:
+      - PORT=8080
+      - DAPR_GRPC_ENDPOINT=primes-python-dapr:50002
+      - DAPR_HTTP_ENDPOINT=http://primes-python-dapr:3501
+    networks:
+      - dapr-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  primes-python-dapr:
+    image: "daprio/daprd:${DAPRD_VERSION}"
+    command:
+      [
+        "./daprd",
+        "-app-id",
+        "primes-python",
+        "-app-channel-address",
+        "primes-python",
+        "-app-port",
+        "8080",
+        "-dapr-http-port",
+        "3501",
+        "-dapr-grpc-port",
+        "50002",
+        "-placement-host-address",
+        "placement:50005",
+        "-scheduler-host-address",
+        "scheduler-0:50006,scheduler-1:50006,scheduler-2:50006",
+        "-resources-path",
+        "/components",
+        "-config",
+        "/dapr_config/config.yml",
+        "-log-level",
+        "info",
+      ]
+    volumes:
+      - "./components:/components"
+      - "./dapr_config/:/dapr_config"
+    depends_on:
+      - primes-python
+      - placement
+      - scheduler-0
+      - scheduler-1
+      - scheduler-2
+    networks:
+      - dapr-network
+    ports:
+      - "3501:3501"
+
+  # Java Application
+  primes-java:
+    build:
+      context: ./java
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8080"
+    environment:
+      - SERVER_PORT=8080
+      - DAPR_GRPC_ENDPOINT=primes-java-dapr:50003
+      - DAPR_HTTP_ENDPOINT=http://primes-java-dapr:3502
+    networks:
+      - dapr-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  primes-java-dapr:
+    image: "daprio/daprd:${DAPRD_VERSION}"
+    command:
+      [
+        "./daprd",
+        "-app-id",
+        "primes-java",
+        "-app-channel-address",
+        "primes-java",
+        "-app-port",
+        "8080",
+        "-dapr-http-port",
+        "3502",
+        "-dapr-grpc-port",
+        "50003",
+        "-placement-host-address",
+        "placement:50005",
+        "-scheduler-host-address",
+        "scheduler-0:50006,scheduler-1:50006,scheduler-2:50006",
+        "-resources-path",
+        "/components",
+        "-config",
+        "/dapr_config/config.yml",
+        "-log-level",
+        "info",
+      ]
+    volumes:
+      - "./components:/components"
+      - "./dapr_config/:/dapr_config"
+    depends_on:
+      - primes-java
+      - placement
+      - scheduler-0
+      - scheduler-1
+      - scheduler-2
+    networks:
+      - dapr-network
+    ports:
+      - "3502:3502"
+
+  # .NET Application
+  primes-dotnet:
+    build:
+      context: ./dotnet
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - DAPR_GRPC_ENDPOINT=http://primes-dotnet-dapr:50004
+      - DAPR_HTTP_ENDPOINT=http://primes-dotnet-dapr:3503
+    networks:
+      - dapr-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  primes-dotnet-dapr:
+    image: "daprio/daprd:${DAPRD_VERSION}"
+    command:
+      [
+        "./daprd",
+        "-app-id",
+        "primes-dotnet",
+        "-app-channel-address",
+        "primes-dotnet",
+        "-app-port",
+        "8080",
+        "-dapr-http-port",
+        "3503",
+        "-dapr-grpc-port",
+        "50004",
+        "-placement-host-address",
+        "placement:50005",
+        "-scheduler-host-address",
+        "scheduler-0:50006,scheduler-1:50006,scheduler-2:50006",
+        "-resources-path",
+        "/components",
+        "-config",
+        "/dapr_config/config.yml",
+        "-log-level",
+        "info",
+      ]
+    volumes:
+      - "./components:/components"
+      - "./dapr_config/:/dapr_config"
+    depends_on:
+      - primes-dotnet
+      - placement
+      - scheduler-0
+      - scheduler-1
+      - scheduler-2
+    networks:
+      - dapr-network
+    ports:
+      - "3503:3503"
+
+  # Saga Orchestrator Application
+  saga-orchestrator:
+    build:
+      context: ./saga
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8080"
+    environment:
+      - PORT=8080
+      - DAPR_GRPC_ENDPOINT=saga-orchestrator-dapr:50010
+      - DAPR_HTTP_ENDPOINT=http://saga-orchestrator-dapr:3504
+    networks:
+      - dapr-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  saga-orchestrator-dapr:
+    image: "daprio/daprd:${DAPRD_VERSION}"
+    command:
+      [
+        "./daprd",
+        "-app-id",
+        "saga-orchestrator",
+        "-app-channel-address",
+        "saga-orchestrator",
+        "-app-port",
+        "8080",
+        "-dapr-http-port",
+        "3504",
+        "-dapr-grpc-port",
+        "50010",
+        "-placement-host-address",
+        "placement:50005",
+        "-scheduler-host-address",
+        "scheduler-0:50006,scheduler-1:50006,scheduler-2:50006",
+        "-resources-path",
+        "/components",
+        "-config",
+        "/dapr_config/config.yml",
+        "-log-level",
+        "info",
+      ]
+    volumes:
+      - "./components:/components"
+      - "./dapr_config/:/dapr_config"
+    depends_on:
+      - saga-orchestrator
+      - placement
+      - scheduler-0
+      - scheduler-1
+      - scheduler-2
+    networks:
+      - dapr-network
+    ports:
+      - "3504:3504"
+
+  # Dapr Scheduler Cluster (3 instances)
+  scheduler-0:
+    image: "daprio/dapr:${DAPR_VERSION}"
+    command:
+      [
+        "./scheduler",
+        "--etcd-data-dir",
+        "/var/run/dapr/scheduler",
+        "--log-level",
+        "warn",
+      ]
+    volumes:
+      - ./dapr_scheduler/0:/var/run/dapr/scheduler
+    networks:
+      - dapr-network
+
+  scheduler-1:
+    image: "daprio/dapr:${DAPR_VERSION}"
+    command:
+      [
+        "./scheduler",
+        "--etcd-data-dir",
+        "/var/run/dapr/scheduler",
+        "--log-level",
+        "warn",
+      ]
+    volumes:
+      - ./dapr_scheduler/1:/var/run/dapr/scheduler
+    networks:
+      - dapr-network
+
+  scheduler-2:
+    image: "daprio/dapr:${DAPR_VERSION}"
+    command:
+      [
+        "./scheduler",
+        "--etcd-data-dir",
+        "/var/run/dapr/scheduler",
+        "--log-level",
+        "warn",
+      ]
+    volumes:
+      - ./dapr_scheduler/2:/var/run/dapr/scheduler
+    networks:
+      - dapr-network
+
+  # Dapr Placement Service
+  placement:
+    image: "daprio/dapr:${DAPR_VERSION}"
+    command: ["./placement", "-port", "50005", "-log-level", "warn"]
+    ports:
+      - "50005:50005"
+    networks:
+      - dapr-network
+
+  # PostgreSQL Database
+  postgres-db:
+    image: postgres:16.2-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=wO2VGDsMKR
+      - POSTGRES_DB=dapr
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "dapr", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    networks:
+      - dapr-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  # Diagrid Workflow Dashboard
+  workflow-dashboard:
+    image: ghcr.io/diagridio/diagrid-dashboard:latest
+    restart: always
+    environment:
+      - COMPONENT_FILE=/app/components/statestore.yaml
+    ports:
+      - "8080:8080"
+    networks:
+      - dapr-network
+    volumes:
+      - "./components/statestore.yaml:/app/components/statestore.yaml"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+networks:
+  dapr-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
