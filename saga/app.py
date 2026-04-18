@@ -4,6 +4,7 @@ from typing import List, Optional, Dict, Any
 from dapr.ext.workflow import WorkflowRuntime, DaprWorkflowContext, DaprWorkflowClient
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -135,13 +136,21 @@ def get_saga_status(instance_id: str):
         if not state:
             raise HTTPException(status_code=404, detail=f"Workflow {instance_id} not found")
 
+        # Parse the serialized output
+        output = None
+        if state.serialized_output:
+            try:
+                output = json.loads(state.serialized_output)
+            except json.JSONDecodeError:
+                output = None
+
         return {
             "instance_id": instance_id,
             "workflow_name": state.name,
             "runtime_status": state.runtime_status.name if hasattr(state.runtime_status, 'name') else str(state.runtime_status),
             "created_at": state.created_at.isoformat() if state.created_at else None,
             "last_updated_at": state.last_updated_at.isoformat() if state.last_updated_at else None,
-            "serialized_output": state.serialized_output
+            "output": output
         }
     except HTTPException:
         raise

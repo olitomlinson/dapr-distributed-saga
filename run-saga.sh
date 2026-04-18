@@ -108,8 +108,8 @@ echo ""
 # Get full result
 result=$(curl -s "http://localhost:${SAGA_PORT}/saga/status/${INSTANCE_ID}")
 
-# Parse output - the serialized_output is a JSON string
-output=$(echo "$result" | jq '.serialized_output | fromjson')
+# Parse output - use the parsed output field
+output=$(echo "$result" | jq '.output')
 
 # Extract summary statistics
 total_executions=$(echo "$output" | jq -r '.totalExecutions // 0')
