@@ -27,6 +27,7 @@ Each implementation follows the same pattern:
 
 ## Prerequisites
 
+- Mac OS / ARM Architecture
 - Docker and Docker Compose
 - jq (for running the test script)
   - macOS: `brew install jq`
@@ -66,7 +67,7 @@ Each implementation follows the same pattern:
 └── run-saga.sh              # Test script for saga orchestrator
 ```
 
-## Quick Start
+## Quick Start (Mac OS ARM architecture only)
 
 ### 1. Build and Start All Services
 
