@@ -1,6 +1,6 @@
 # Dapr Distributed Saga (Multi-Language Workflows Example)
 
-This project demonstrates Dapr workflow capabilities across all 4 supported languages (Go, Python, Java, and .NET). Each implementation calculates prime numbers using the Sieve of Eratosthenes algorithm, showcasing workflow orchestration patterns and activity execution. Additionally, it includes a saga orchestrator that demonstrates distributed saga patterns by coordinating all implementations in a single workflow.
+This project demonstrates Dapr workflow capabilities across 5 languages (Go, Python, Java, .NET, and TypeScript). Each implementation calculates prime numbers using the Sieve of Eratosthenes algorithm, showcasing workflow orchestration patterns and activity execution. Additionally, it includes a saga orchestrator that demonstrates distributed saga patterns by coordinating all implementations in a single workflow.
 
 ![Architecture Diagram](diagram.png)
 
@@ -8,8 +8,8 @@ This project demonstrates Dapr workflow capabilities across all 4 supported lang
 
 The application consists of:
 
-- **4 Language Implementations**: Go, Python, Java, and .NET applications each implementing the same prime number calculation workflow
-- **Saga Orchestrator**: Python-based orchestrator that coordinates all 4 implementations in a distributed saga pattern
+- **5 Language Implementations**: Go, Python, Java, .NET, and TypeScript applications each implementing the same prime number calculation workflow
+- **Saga Orchestrator**: Python-based orchestrator that coordinates all 5 implementations in a distributed saga pattern
 - **Dapr Sidecars**: One per application for workflow orchestration
 - **Dapr Scheduler Cluster**: 3-node Dapr scheduler cluster for workflow scheduling
 - **Dapr Placement Service**: Dapr placement service for actor distribution
@@ -56,6 +56,15 @@ Each implementation follows the same pattern:
 │   ├── Workflows/
 │   ├── Activities/
 │   └── Dockerfile
+├── typescript/              # TypeScript implementation
+│   ├── src/
+│   │   ├── index.ts
+│   │   ├── workflows/
+│   │   ├── activities/
+│   │   └── models/
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── Dockerfile
 ├── saga/                    # Saga orchestrator (Python)
 │   ├── app.py
 │   ├── requirements.txt
@@ -80,6 +89,7 @@ This will start:
 - Python app on http://localhost:8082 (Dapr sidecar: 3501)
 - Java app on http://localhost:8083 (Dapr sidecar: 3502)
 - .NET app on http://localhost:8084 (Dapr sidecar: 3503)
+- TypeScript app on http://localhost:8086 (Dapr sidecar: 3505)
 - Saga orchestrator on http://localhost:8085 (Dapr sidecar: 3504)
 - Diagrid Dashboard on http://localhost:8080
 - PostgreSQL on localhost:5432
@@ -93,7 +103,7 @@ This will start:
 ```
 
 This script will:
-1. Schedule a workflow instance on each of the 4 implementations
+1. Schedule a workflow instance on each of the 5 implementations
 2. Poll for completion
 3. Display results including:
    - Number of primes found (25 primes up to 100)
@@ -102,8 +112,9 @@ This script will:
 
 You can also run specific implementations:
 ```bash
-./run-primes.sh --go --python    # Run only Go and Python
-./run-primes.sh --java            # Run only Java
+./run-primes.sh --go --python       # Run only Go and Python
+./run-primes.sh --typescript        # Run only TypeScript
+./run-primes.sh --java --dotnet     # Run only Java and .NET
 ```
 
 #### Saga Orchestrator (run-saga.sh)
@@ -112,12 +123,12 @@ You can also run specific implementations:
 ./run-saga.sh
 ```
 
-This script demonstrates a saga orchestrator pattern that coordinates all 4 implementations:
-1. Schedules a `SagaOrchestratorWorkflow` that calls all 4 apps
+This script demonstrates a saga orchestrator pattern that coordinates all 5 implementations:
+1. Schedules a `SagaOrchestratorWorkflow` that calls all 5 apps
 2. Aggregates results from all implementations
 3. Displays:
    - Total executions and success rate
-   - Total primes found across all apps (100 primes)
+   - Total primes found across all apps (125 primes)
    - Average calculation time
    - Individual results for each language
 
@@ -178,6 +189,7 @@ Replace `3500` with the appropriate Dapr sidecar port:
 - Python: 3501
 - Java: 3502
 - .NET: 3503
+- TypeScript: 3505
 
 ## Implementation Details
 
@@ -217,6 +229,14 @@ Replace `3500` with the appropriate Dapr sidecar port:
 - Strongly-typed workflow and activity classes
 - Record types for immutable data models
 
+### TypeScript Implementation
+
+- Uses `@dapr/dapr` v3.17.0
+- Node.js with Express framework
+- Async generator function pattern for workflows
+- Full TypeScript type safety with interfaces
+- Workflow defined as `async function*` with `yield` for activity calls
+
 ## Algorithm: Sieve of Eratosthenes
 
 All implementations use the same efficient algorithm for finding prime numbers:
@@ -237,6 +257,7 @@ For maxNumber=100, this finds 25 primes: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31
 | Python | 8082 | 3501 | 50002 |
 | Java | 8083 | 3502 | 50003 |
 | .NET | 8084 | 3503 | 50004 |
+| TypeScript | 8086 | 3505 | 50007 |
 | Saga | 8085 | 3504 | 50006 |
 | Dashboard | 8080 | - | - |
 | PostgreSQL | 5432 | - | - |

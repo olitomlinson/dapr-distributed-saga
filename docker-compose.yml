@@ -227,6 +227,65 @@ services:
     ports:
       - "3503:3503"
 
+  # TypeScript Application
+  primes-typescript:
+    build:
+      context: ./typescript
+      dockerfile: Dockerfile
+    ports:
+      - "8086:8080"
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      - DAPR_HOST=primes-typescript-dapr
+      - DAPR_GRPC_PORT=50007
+      - DAPR_HTTP_ENDPOINT=http://primes-typescript-dapr:3505
+    networks:
+      - dapr-network
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  primes-typescript-dapr:
+    image: "daprio/daprd:${DAPRD_VERSION}"
+    command:
+      [
+        "./daprd",
+        "-app-id",
+        "primes-typescript",
+        "-app-channel-address",
+        "primes-typescript",
+        "-app-port",
+        "8080",
+        "-dapr-http-port",
+        "3505",
+        "-dapr-grpc-port",
+        "50007",
+        "-placement-host-address",
+        "placement:50005",
+        "-scheduler-host-address",
+        "scheduler-0:50006,scheduler-1:50006,scheduler-2:50006",
+        "-resources-path",
+        "/components",
+        "-config",
+        "/dapr_config/config.yml",
+        "-log-level",
+        "info",
+      ]
+    volumes:
+      - "./components:/components"
+      - "./dapr_config/:/dapr_config"
+    depends_on:
+      - primes-typescript
+      - placement
+      - scheduler-0
+      - scheduler-1
+      - scheduler-2
+    networks:
+      - dapr-network
+    ports:
+      - "3505:3505"
+
   # Saga Orchestrator Application
   saga-orchestrator:
     build:

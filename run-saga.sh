@@ -40,7 +40,7 @@ response=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
     -H "Content-Type: application/json" \
     -d "{
             \"maxNumber\": ${MAX_NUMBER},
-            \"app_ids\": [\"primes-go\", \"primes-python\", \"primes-java\", \"primes-dotnet\"]
+            \"app_ids\": [\"primes-go\", \"primes-python\", \"primes-java\", \"primes-dotnet\", \"primes-typescript\"]
         }")
 
 # Extract HTTP status and body

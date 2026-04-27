@@ -12,6 +12,7 @@ RUN_GO=false
 RUN_PYTHON=false
 RUN_JAVA=false
 RUN_DOTNET=false
+RUN_TYPESCRIPT=false
 
 # If no flags provided, run all
 if [ $# -eq 0 ]; then
@@ -19,6 +20,7 @@ if [ $# -eq 0 ]; then
     RUN_PYTHON=true
     RUN_JAVA=true
     RUN_DOTNET=true
+    RUN_TYPESCRIPT=true
 else
     # Parse flags
     while [[ $# -gt 0 ]]; do
@@ -39,21 +41,26 @@ else
                 RUN_DOTNET=true
                 shift
                 ;;
+            --typescript)
+                RUN_TYPESCRIPT=true
+                shift
+                ;;
             --help|-h)
-                echo "Usage: $0 [--go] [--python] [--java] [--dotnet]"
+                echo "Usage: $0 [--go] [--python] [--java] [--dotnet] [--typescript]"
                 echo ""
                 echo "Options:"
-                echo "  --go      Run Go workflow"
-                echo "  --python  Run Python workflow"
-                echo "  --java    Run Java workflow"
-                echo "  --dotnet  Run .NET workflow"
+                echo "  --go         Run Go workflow"
+                echo "  --python     Run Python workflow"
+                echo "  --java       Run Java workflow"
+                echo "  --dotnet     Run .NET workflow"
+                echo "  --typescript Run TypeScript workflow"
                 echo ""
                 echo "If no options are provided, all workflows will run."
                 echo ""
                 echo "Examples:"
-                echo "  $0                    # Run all workflows"
-                echo "  $0 --python --java    # Run only Python and Java"
-                echo "  $0 --go               # Run only Go"
+                echo "  $0                          # Run all workflows"
+                echo "  $0 --python --java          # Run only Python and Java"
+                echo "  $0 --go --typescript        # Run only Go and TypeScript"
                 exit 0
                 ;;
             *)
@@ -74,6 +81,7 @@ GO_PORT=3500
 PYTHON_PORT=3501
 JAVA_PORT=3502
 DOTNET_PORT=3503
+TYPESCRIPT_PORT=3505
 
 # Colors for output
 RED='\033[0;31m'
@@ -173,6 +181,7 @@ $RUN_GO && RUNNING_LANGS+=("Go")
 $RUN_PYTHON && RUNNING_LANGS+=("Python")
 $RUN_JAVA && RUNNING_LANGS+=("Java")
 $RUN_DOTNET && RUNNING_LANGS+=(".NET")
+$RUN_TYPESCRIPT && RUNNING_LANGS+=("TypeScript")
 
 echo "Scheduling workflows for: ${RUNNING_LANGS[*]}"
 echo ""
@@ -192,6 +201,10 @@ fi
 
 if [ "$RUN_DOTNET" = true ]; then
     DOTNET_INSTANCE=$(schedule_workflow "dotnet" "$DOTNET_PORT")
+fi
+
+if [ "$RUN_TYPESCRIPT" = true ]; then
+    TYPESCRIPT_INSTANCE=$(schedule_workflow "typescript" "$TYPESCRIPT_PORT")
 fi
 
 echo ""
@@ -219,6 +232,11 @@ if [ "$RUN_DOTNET" = true ]; then
     DOTNET_P=$(echo "$DOTNET_INSTANCE" | cut -d':' -f2)
 fi
 
+if [ "$RUN_TYPESCRIPT" = true ]; then
+    TYPESCRIPT_ID=$(echo "$TYPESCRIPT_INSTANCE" | cut -d':' -f1)
+    TYPESCRIPT_P=$(echo "$TYPESCRIPT_INSTANCE" | cut -d':' -f2)
+fi
+
 # Wait for all workflows to complete
 if [ "$RUN_GO" = true ]; then
     wait_for_completion "$GO_ID" "$GO_P" "Go"
@@ -234,6 +252,10 @@ fi
 
 if [ "$RUN_DOTNET" = true ]; then
     wait_for_completion "$DOTNET_ID" "$DOTNET_P" ".NET"
+fi
+
+if [ "$RUN_TYPESCRIPT" = true ]; then
+    wait_for_completion "$TYPESCRIPT_ID" "$TYPESCRIPT_P" "TypeScript"
 fi
 
 echo ""
@@ -256,6 +278,10 @@ fi
 
 if [ "$RUN_DOTNET" = true ]; then
     display_results "$DOTNET_ID" "$DOTNET_P" ".NET"
+fi
+
+if [ "$RUN_TYPESCRIPT" = true ]; then
+    display_results "$TYPESCRIPT_ID" "$TYPESCRIPT_P" "TypeScript"
 fi
 
 echo ""
