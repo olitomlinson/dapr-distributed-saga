@@ -2,7 +2,7 @@
 
 This project demonstrates Dapr workflow capabilities across 5 languages (Go, Python, Java, .NET, and TypeScript). Each implementation calculates prime numbers using the Sieve of Eratosthenes algorithm, showcasing workflow orchestration patterns and activity execution. Additionally, it includes a saga orchestrator that demonstrates distributed saga patterns by coordinating all implementations in a single workflow.
 
-![Architecture Diagram](diagram.png)
+![Architecture Diagram](diagram-2.png)
 
 ## Architecture
 
@@ -32,49 +32,6 @@ Each implementation follows the same pattern:
 - jq (for running the test script)
   - macOS: `brew install jq`
   - Linux: `sudo apt-get install jq`
-
-## Project Structure
-
-```
-.
-├── go/                      # Go implementation
-│   ├── main.go
-│   ├── go.mod
-│   └── Dockerfile
-├── python/                  # Python implementation
-│   ├── app.py
-│   ├── requirements.txt
-│   └── Dockerfile
-├── java/                    # Java implementation
-│   ├── pom.xml
-│   ├── src/main/java/com/example/
-│   └── Dockerfile
-├── dotnet/                  # .NET implementation
-│   ├── PrimeWorkflowApp.csproj
-│   ├── Program.cs
-│   ├── Models/
-│   ├── Workflows/
-│   ├── Activities/
-│   └── Dockerfile
-├── typescript/              # TypeScript implementation
-│   ├── src/
-│   │   ├── index.ts
-│   │   ├── workflows/
-│   │   ├── activities/
-│   │   └── models/
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── Dockerfile
-├── saga/                    # Saga orchestrator (Python)
-│   ├── app.py
-│   ├── requirements.txt
-│   └── Dockerfile
-├── components/              # Dapr components
-│   └── statestore.yaml
-├── docker-compose.yml       # Infrastructure orchestration
-├── run-primes.sh            # Test script for individual workflows
-└── run-saga.sh              # Test script for saga orchestrator
-```
 
 ## Quick Start (Mac OS ARM architecture only)
 
@@ -192,6 +149,50 @@ Replace `3500` with the appropriate Dapr sidecar port:
 - TypeScript: 3505
 
 ## Implementation Details
+
+
+## Project Structure
+
+```
+.
+├── go/                      # Go implementation
+│   ├── main.go
+│   ├── go.mod
+│   └── Dockerfile
+├── python/                  # Python implementation
+│   ├── app.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── java/                    # Java implementation
+│   ├── pom.xml
+│   ├── src/main/java/com/example/
+│   └── Dockerfile
+├── dotnet/                  # .NET implementation
+│   ├── PrimeWorkflowApp.csproj
+│   ├── Program.cs
+│   ├── Models/
+│   ├── Workflows/
+│   ├── Activities/
+│   └── Dockerfile
+├── typescript/              # TypeScript implementation
+│   ├── src/
+│   │   ├── index.ts
+│   │   ├── workflows/
+│   │   ├── activities/
+│   │   └── models/
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── Dockerfile
+├── saga/                    # Saga orchestrator (Python)
+│   ├── app.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── components/              # Dapr components
+│   └── statestore.yaml
+├── docker-compose.yml       # Infrastructure orchestration
+├── run-primes.sh            # Test script for individual workflows
+└── run-saga.sh              # Test script for saga orchestrator
+```
 
 ### Go Implementation
 
